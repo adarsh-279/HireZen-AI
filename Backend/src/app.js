@@ -1,6 +1,7 @@
 import express, { urlencoded } from 'express';
 import dotenv from 'dotenv';
 import cookieParser from "cookie-parser";
+import cors from "cors"
 import authRouter from './routes/auth.routes.js';
 
 
@@ -11,6 +12,11 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended: true}))
 app.use(cookieParser())
+
+app.use(cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true
+}))
 
 /* all authentication related routes are used from here */
 app.use("/api/auth", authRouter)
