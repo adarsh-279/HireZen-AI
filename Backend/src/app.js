@@ -1,11 +1,12 @@
-import express, { urlencoded } from 'express';
 import dotenv from 'dotenv';
+dotenv.config();
+
+import express, { urlencoded } from 'express';
 import cookieParser from "cookie-parser";
 import cors from "cors"
 import authRouter from './routes/auth.routes.js';
+import interviewRouter from './routes/interview.routes.js';
 
-
-dotenv.config();
 
 const app = express();
 
@@ -20,6 +21,9 @@ app.use(cors({
 
 /* all authentication related routes are used from here */
 app.use("/api/auth", authRouter)
+
+/* all interview related routes are used from here */
+app.use("/api/interview", interviewRouter)
 
 app.get("/", (req, res) => {
     res.send("Default Route");
