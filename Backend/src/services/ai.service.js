@@ -1,43 +1,59 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import { GoogleGenAI } from "@google/genai";
-import { z } from "zod"
-import {zodToJsonSchema} from "zod-to-json-schema";
+import Groq from "groq-sdk";
+import { z } from "zod";
 
-// The client gets the API key from the environment variable `GEMINI_API_KEY`.
-const ai = new GoogleGenAI({
-    apiKey: process.env.GEMINI_API_KEY
+const ai = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
 });
 
-
 const interviewReportSchema = z.object({
-    matchScore: z.number().describe("A score between 0 and 100 indicating how well the candidate's profile matches the job describe"),
-    technicalQuestions: z.array(z.object({
-        question: z.string().describe("The technical question can be asked in the interview"),
-    })).describe("Technical questions that can be asked in the interview along with their intention and how to answer them"),
-    behavioralQuestions: z.array(z.object({
-        question: z.string().describe("The technical question can be asked in the interview"),
-    })).describe("Behavioral questions that can be asked in the interview along with their intention and how to answer them"),
-    skillGaps: z.array(z.object({
-        skill: z.string().describe("The skill which the candidate is lacking"),
-        severity: z.enum([ "low", "medium", "high" ]).describe("The severity of this skill gap, i.e. how important is this skill for the job and how much it can impact the candidate's chances")
-    })).describe("List of skill gaps in the candidate's profile along with their severity"),
-    preparationPlan: z.array(z.object({
-        day: z.number().describe("The day number in the preparation plan, starting from 1"),
-        focus: z.string().describe("The main focus of this day in the preparation plan, e.g. data structures, system design, mock interviews etc."),
-        tasks: z.array(z.string()).describe("List of tasks to be done on this day to follow the preparation plan, e.g. read a specific book or article, solve a set of problems, watch a video etc.")
-    })).describe("A day-wise preparation plan for the candidate to follow in order to prepare for the interview effectively"),
-    title: z.string().describe("The title of the job for which the interview report is generated"),
-})
+  matchScore: z.number().min(0).max(100),
 
-async function generateInterviewReport({ resume, selfDescription, jobDescription }) {
+  title: z.string(),
 
+  technicalQuestions: z.array(
+    z.object({
+      question: z.string(),
+      intention: z.string(),
+      answer: z.string(),
+    }),
+  ),
 
-const prompt = `
-You are an expert technical interviewer.
+  behavioralQuestions: z.array(
+    z.object({
+      question: z.string(),
+      intention: z.string(),
+      answer: z.string(),
+    }),
+  ),
 
-Analyze the candidate profile and generate an interview preparation report.
+  skillGaps: z.array(
+    z.object({
+      skill: z.string(),
+      severity: z.enum(["low", "medium", "high"]),
+    }),
+  ),
+
+  preparationPlan: z.array(
+    z.object({
+      day: z.number(),
+      focus: z.string(),
+      tasks: z.array(z.string()),
+    }),
+  ),
+});
+
+async function generateInterviewReport({
+  resume,
+  selfDescription,
+  jobDescription,
+}) {
+  const prompt = `
+You are an expert technical interviewer and hiring manager.
+
+Analyze the candidate profile.
 
 Resume:
 ${resume}
@@ -48,111 +64,169 @@ ${selfDescription}
 Job Description:
 ${jobDescription}
 
-Return ONLY valid JSON in this structure:
+Generate:
+
+1. Match score (0-100)
+
+2. Job title
+
+3. 4-6 Technical Interview Questions
+
+Each question should contain:
+- question
+- intention
+- answer
+
+4. 3-5 Behavioral Questions
+
+Each should contain:
+- question
+- intention
+- answer
+
+5. 3-5 Skill Gaps
+
+Each should contain:
+- skill
+- severity
+
+6. 7 Day Preparation Plan
+
+Each day should contain:
+- day
+- focus
+- tasks
+
+Return ONLY valid JSON.
+
+Do not return markdown.
+Do not return explanations.
+`;
+
+  const response = await ai.chat.completions.create({
+    model: "llama-3.3-70b-versatile",
+    temperature: 0.2,
+    response_format: {
+      type: "json_object",
+    },
+    messages: [
+      {
+        role: "system",
+        content: `
+You are an expert technical interviewer and hiring manager.
+
+You MUST return ONLY valid JSON.
+
+Return ONLY valid JSON using EXACTLY these property names.
 
 {
- "matchScore": number,
- "title": "job title",
- "technicalQuestions": [
-   {
-     "question": "string",
-     "intention": "string",
-     "answer": "string"
-   }
- ],
- "behavioralQuestions": [
-   {
-     "question": "string",
-     "intention": "string",
-     "answer": "string"
-   }
- ],
- "skillGaps": [
-   {
-     "skill": "string",
-     "severity": "low | medium | high"
-   }
- ],
- "preparationPlan": [
-   {
-     "day": number,
-     "focus": "string",
-     "tasks": ["string"]
-   }
- ]
+  "matchScore": number,
+  "title": string,
+  "technicalQuestions": [
+    {
+      "question": "",
+      "intention": "",
+      "answer": ""
+    }
+  ],
+  "behavioralQuestions": [
+    {
+      "question": "",
+      "intention": "",
+      "answer": ""
+    }
+  ],
+  "skillGaps": [
+    {
+      "skill": "",
+      "severity": "low"
+    }
+  ],
+  "preparationPlan": [
+    {
+      "day": 1,
+      "focus": "",
+      "tasks": [""]
+    }
+  ]
 }
 
 Rules:
-- matchScore must be between 0 and 100
-- Generate 4-6 technical questions
-- Generate 3-5 behavioral questions
-- Generate 3-5 skill gaps
-- Create a 7 day preparation plan
-- title must be extracted from job description
-- Return ONLY JSON
-`;
+- Use EXACTLY these property names.
+- Do NOT rename any property.
+- Do NOT omit any property.
+- matchScore must be a number between 0 and 100.
+- title must be a string.
+- technicalQuestions must contain 4-6 objects.
+- behavioralQuestions must contain 3-5 objects.
+- skillGaps must contain 3-5 objects.
+- preparationPlan must contain exactly 7 objects.
+- Each technicalQuestions object MUST contain:
+  question, intention, answer.
+- Each behavioralQuestions object MUST contain:
+  question, intention, answer.
+- Each skillGaps object MUST contain:
+  skill, severity.
+- severity must be ONLY one of:
+  "low", "medium", "high".
+- Each preparationPlan object MUST contain:
+  day, focus, tasks.
+- tasks must always be an array of strings.
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash-lite",
-      contents: prompt + "\nIMPORTANT: Follow JSON schema exactly.",
-      config: {
-        responseMimeType: "application/json",
-        responseJsonSchema: zodToJsonSchema(interviewReportSchema),
+DO NOT use these property names:
+- match_score
+- job_title
+- technical_questions
+- behavioral_questions
+- skill_gaps
+- preparation_plan
+
+Do NOT wrap the JSON inside markdown.
+Do NOT include explanations.
+Do NOT include any text before or after the JSON.
+`,
       },
-    });
-  
-    const raw = response.text?.trim();
-    
-  console.log("RAW AI RESPONSE:\n", raw);
-  
+      {
+        role: "user",
+        content: prompt,
+      },
+    ],
+  });
+
+  console.log(JSON.stringify(response.choices, null, 2));
+
+  const raw = response.choices?.[0]?.message?.content;
+
   if (!raw) {
-    throw new Error("AI returned empty response");
-  }
-
-  function normalizeAIResponse(data) {
-    if (Array.isArray(data.technicalQuestions)) {
-      data.technicalQuestions = data.technicalQuestions.map((q) => ({
-        question: q,
-      }));
-    }
-
-    if (Array.isArray(data.behavioralQuestions)) {
-      data.behavioralQuestions = data.behavioralQuestions.map((q) => ({
-        question: q,
-      }));
-    }
-
-    if (Array.isArray(data.skillGaps)) {
-      data.skillGaps = data.skillGaps.map((skill) => ({
-        skill,
-        severity: "medium",
-      }));
-    }
-
-    if (Array.isArray(data.preparationPlan)) {
-      data.preparationPlan = data.preparationPlan.map((plan, index) => ({
-        day: index + 1,
-        focus: plan.split(":")[0] || "Preparation",
-        tasks: [plan],
-      }));
-    }
-
-    return data;
+    throw new Error("AI returned an empty response.");
   }
 
   let parsed = JSON.parse(raw);
-  parsed = normalizeAIResponse(parsed);
+
+  try {
+    parsed = {
+      matchScore: parsed.matchScore ?? parsed.match_score,
+      title: parsed.title ?? parsed.job_title,
+      technicalQuestions:
+        parsed.technicalQuestions ?? parsed.technical_questions,
+      behavioralQuestions:
+        parsed.behavioralQuestions ?? parsed.behavioral_questions,
+      skillGaps: parsed.skillGaps ?? parsed.skill_gaps,
+      preparationPlan: parsed.preparationPlan ?? parsed.preparation_plan,
+    };
+  } catch (err) {
+    console.error(raw);
+    throw new Error("Invalid JSON returned by AI.");
+  }
 
   const validated = interviewReportSchema.safeParse(parsed);
 
   if (!validated.success) {
-    console.error(validated.error);
-    throw new Error("AI response does not match schema");
+    console.error(validated.error.format());
+    throw new Error("AI response does not match the expected schema.");
   }
 
   return validated.data;
-
 }
 
-
-export default generateInterviewReport
+export default generateInterviewReport;
