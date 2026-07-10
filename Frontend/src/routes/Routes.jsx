@@ -5,6 +5,7 @@ import Protected from "../auth/components/protected.jsx";
 import Dashboard from "../dashboard/pages/Dashboard.jsx";
 import ResumeUpload from "../resume/pages/ResumeUpload.jsx";
 import InterviewReport from "../report/pages/InterviewReport.jsx";
+import ReportDetails from "../report/components/ReportDetails.jsx";
 
 export const router = createBrowserRouter([
   {
@@ -38,5 +39,13 @@ export const router = createBrowserRouter([
         <InterviewReport />
       </Protected>
     )
-  }
+  },
+  {
+    path: "/reports/:id",
+    element: (
+      <Protected>
+        <ReportDetails />
+      </Protected>
+    )
+  },
 ]);

@@ -10,7 +10,7 @@ const Dashboard = () => {
         <>
             <Navbar />
             <div className="p-15 space-y-8">
-                <div>
+                <div className=' pt-15'>
                     <h1 className="text-4xl font-bold">
                         Welcome back, <span className="text-white">User</span>
                     </h1>
