@@ -1,6 +1,6 @@
 const Footer = () => {
   return (
-    <footer className="border border-zinc-800 rounded-xl bg-[#111111] px-8 py-6 mt-10">
+    <footer className="border-t-2 border-zinc-800 bg-[#111111] px-8 py-6 mt-10">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
         {/* Left */}
         <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6">

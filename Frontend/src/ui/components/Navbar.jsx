@@ -3,7 +3,7 @@ import { LogOut } from "lucide-react";
 
 const Navbar = () => {
     return (
-        <nav className="bg-[#111111] border border-gray-800 rounded-xl px-8 py-4 flex items-center justify-between">
+        <nav className="w-full bg-[#111111c7] backdrop-blur-sm border-gray-800 border-b-2 px-8 py-4 flex items-center justify-between fixed">
             <NavLink >
                 <div className="text-2xl font-bold">
                     <span className="text-[#4f46cd]">HireZen AI</span>
