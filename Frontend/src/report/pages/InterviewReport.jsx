@@ -1,32 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import Navbar from "../../ui/components/Navbar";
 import Footer from "../../ui/components/Footer";
 import ReportCard from "../components/ReportCard";
 
-const InterviewReport = () => {
-  const [reports, setReports] = useState([]);
+import { useInterview } from "../hooks/useInterview";
 
-  // temporary dummy data
+const InterviewReport = () => {
+  const {reports, getAllReport} = useInterview()
+
   useEffect(() => {
-    setReports([
-      {
-        _id: "1",
-        title: "Full Stack Developer Intern",
-        jobDescription:
-          "AI Startup Impact is hiring Full Stack Developer Intern...",
-        matchScore: 85,
-        createdAt: new Date(),
-      },
-      {
-        _id: "2",
-        title: "Frontend Developer",
-        jobDescription: "Frontend React Developer for SaaS Product...",
-        matchScore: 79,
-        createdAt: new Date(),
-      },
-    ]);
-  }, []);
+    getAllReport()
+  },[]);
 
   return (
     <div className="min-h-screen bg-[#0F0F0F] text-white flex flex-col">

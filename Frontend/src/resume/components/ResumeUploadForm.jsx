@@ -1,7 +1,15 @@
 import { Upload, FileText, X } from "lucide-react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import { useInterview } from "../../report/hooks/useInterview";
+import { useNavigate } from "react-router";
 
 const ResumeUploadForm = ({ resume, setResume }) => {
+  const { generateReport } = useInterview()
+  const [jobDescription, setJobDescription] = useState("")
+  const [selfDescription, setSelfDescription] = useState("")
+  
+  const navigate = useNavigate()
+
   const fileInputRef = useRef(null);
 
   const handleFileChange = (e) => {
@@ -26,6 +34,13 @@ const ResumeUploadForm = ({ resume, setResume }) => {
     setResume(null);
     fileInputRef.current.value = "";
   };
+
+  const handleGenerateInterviewReport = async () => {
+    const resumeFile = fileInputRef.current.files[0]
+    const data = await generateReport({resumeFile, selfDescription, jobDescription})
+    if (data && data._id) navigate(`/reports/${data._id}`)
+  }
+
 
   return (
     <div className="bg-[#181818] rounded-xl border border-zinc-800 p-8">
@@ -90,6 +105,9 @@ const ResumeUploadForm = ({ resume, setResume }) => {
         </label>
 
         <textarea
+          onChange={(e) => { setSelfDescription(e.target.value) }}
+          name="selfDescription"
+          id="selfDescription"
           rows={5}
           placeholder="Briefly describe yourself, your skills and career goals..."
           className="w-full rounded-lg bg-[#111] border border-zinc-700 p-4 outline-none focus:border-indigo-500 transition resize-none"
@@ -103,6 +121,9 @@ const ResumeUploadForm = ({ resume, setResume }) => {
         </label>
 
         <textarea
+          onChange={(e) => { setJobDescription(e.target.value) }}
+          name="jobDescription"
+          id="jobDescription"
           rows={5}
           placeholder="Paste the complete job description here..."
           className="w-full rounded-lg bg-[#111] border border-zinc-700 p-4 outline-none focus:border-indigo-500 transition resize-none"
@@ -110,7 +131,9 @@ const ResumeUploadForm = ({ resume, setResume }) => {
       </div>
 
       {/* Button */}
-      <button className="w-full mt-8 bg-indigo-600 hover:bg-indigo-800 transition py-3 rounded-lg font-semibold">
+      <button
+        onClick={handleGenerateInterviewReport}
+        className="w-full mt-8 bg-indigo-600 hover:bg-indigo-800 transition py-3 rounded-lg font-semibold">
         Analyze Resume
       </button>
     </div>

@@ -1,4 +1,6 @@
+import { useEffect } from "react";
 import { useParams } from "react-router";
+
 import Navbar from "../../ui/components/Navbar";
 import Footer from "../../ui/components/Footer";
 
@@ -10,106 +12,17 @@ import SkillGapCard from "../components/SkillGapCard";
 import PreparationTimeline from "../components/PreparationTimeline";
 import JobDescription from "../components/JobDescription";
 
+import { useInterview } from "../hooks/useInterview";
+
 const ReportDetails = () => {
   const { id } = useParams();
+  const { report, getReportById, loading } = useInterview();
 
-  // Replace this with API call
-  const report = {
-    title: "Full Stack Developer Intern",
-    company: "AI Startup Impact",
-    matchScore: 85,
-
-    createdAt: "2026-07-09",
-
-    selfDescription:
-      "I'm a 2nd-year B.Tech student passionate about full-stack development, problem-solving, and creating user-focused digital experiences.",
-
-    resume: "Adarsh Shaw\nB.Tech IT\nReact, Node.js, Express.js, MongoDB...",
-
-    technicalQuestions: [
-      {
-        question: "Explain Event Loop in JavaScript.",
-        intention: "Check async programming knowledge.",
-        answer:
-          "JavaScript uses a single-threaded event loop to execute asynchronous callbacks.",
-      },
-      {
-        question: "Difference between Authentication and Authorization?",
-        intention: "Backend fundamentals",
-        answer:
-          "Authentication verifies identity while Authorization checks permissions.",
-      },
-    ],
-
-    behavioralQuestions: [
-      {
-        question: "Tell me about yourself.",
-        intention: "Communication",
-        answer: "Focus on education, projects, achievements and career goals.",
-      },
-      {
-        question: "Describe a challenge you faced.",
-        intention: "Problem solving",
-        answer: "Explain Situation → Task → Action → Result.",
-      },
-    ],
-
-    skillGaps: [
-      {
-        skill: "AWS",
-        severity: "high",
-      },
-      {
-        skill: "Docker",
-        severity: "medium",
-      },
-      {
-        skill: "System Design",
-        severity: "medium",
-      },
-    ],
-
-    preparationPlan: [
-      {
-        day: 1,
-        focus: "JavaScript",
-        tasks: ["Revise ES6", "Practice Array Questions"],
-      },
-      {
-        day: 2,
-        focus: "React",
-        tasks: ["Hooks", "Context API"],
-      },
-      {
-        day: 3,
-        focus: "Node.js",
-        tasks: ["Express Routing", "Middleware"],
-      },
-      {
-        day: 4,
-        focus: "MongoDB",
-        tasks: ["Aggregation", "Indexing"],
-      },
-      {
-        day: 5,
-        focus: "JWT & Authentication",
-        tasks: ["JWT Flow", "Refresh Tokens"],
-      },
-      {
-        day: 6,
-        focus: "DSA",
-        tasks: ["Arrays", "Strings", "HashMaps"],
-      },
-      {
-        day: 7,
-        focus: "Mock Interview",
-        tasks: ["Behavioral Questions", "Technical Revision"],
-      },
-    ],
-
-    jobDescription:
-      "AI Startup Impact is hiring a Full Stack Developer Intern...",
-  };
+  useEffect(() => {
+    if (typeof getReportById === "function" && id) {
+      getReportById(id);
+    }
+  }, [id]);
 
   return (
     <div className="min-h-screen bg-[#0F0F0F] text-white flex flex-col">
@@ -117,23 +30,35 @@ const ReportDetails = () => {
 
       <main className="flex-1 pt-28 pb-12 px-6">
         <div className="max-w-7xl mx-auto space-y-8">
-          <ReportHeader report={report} />
+          {loading && (
+            <div className="text-center text-zinc-400">Loading report…</div>
+          )}
 
-          <CandidateSummary report={report} />
+          {!loading && !report && (
+            <div className="text-center text-zinc-400">Report not found.</div>
+          )}
 
-          <TechnicalQuestions questions={report.technicalQuestions} />
+          {!loading && report && (
+            <>
+              <ReportHeader report={report} />
 
-          <BehavioralQuestions questions={report.behavioralQuestions} />
+              <CandidateSummary report={report} />
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {report.skillGaps.map((skill, index) => (
-              <SkillGapCard key={index} skill={skill} />
-            ))}
-          </div>
+              <TechnicalQuestions questions={report.technicalQuestions} />
 
-          <PreparationTimeline plan={report.preparationPlan} />
+              <BehavioralQuestions questions={report.behavioralQuestions} />
 
-          <JobDescription description={report.jobDescription} />
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {report.skillGaps?.map((skill, index) => (
+                  <SkillGapCard key={index} skill={skill} />
+                ))}
+              </div>
+
+              <PreparationTimeline preparationPlan={report.preparationPlan || []} />
+
+              <JobDescription description={report.jobDescription} />
+            </>
+          )}
         </div>
       </main>
 

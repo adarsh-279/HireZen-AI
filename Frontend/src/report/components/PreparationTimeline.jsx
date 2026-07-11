@@ -7,7 +7,7 @@ const PreparationTimeline = ({ preparationPlan = [] }) => {
         {preparationPlan.map((day) => (
           <div key={day.day} className="relative pl-8">
             {/* Timeline Dot */}
-            <div className="absolute -left-[11px] top-1 w-5 h-5 rounded-full bg-indigo-600 border-4 border-[#181818]" />
+            <div className="absolute -left-2.75 top-1 w-5 h-5 rounded-full bg-indigo-600 border-4 border-[#181818]" />
 
             {/* Card */}
             <div className="bg-[#111111] border border-zinc-800 rounded-lg p-5">
