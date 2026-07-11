@@ -70,7 +70,7 @@ Generate:
 
 2. Job title
 
-3. 4-6 Technical Interview Questions
+3. 3-5 Technical Interview Questions
 
 Each question should contain:
 - question
@@ -157,7 +157,7 @@ Rules:
 - Do NOT omit any property.
 - matchScore must be a number between 0 and 100.
 - title must be a string.
-- technicalQuestions must contain 4-6 objects.
+- technicalQuestions must contain 3-5 objects.
 - behavioralQuestions must contain 3-5 objects.
 - skillGaps must contain 3-5 objects.
 - preparationPlan must contain exactly 7 objects.
@@ -181,6 +181,22 @@ DO NOT use these property names:
 - skill_gaps
 - preparation_plan
 
+Calculate the match score using this rubric:
+
+- Required technical skills: 40 points
+- Relevant project experience: 25 points
+- Education: 10 points
+- Years of relevant experience: 10 points
+- Soft skills and communication: 10 points
+- Resume quality and completeness: 5 points
+
+Deduct points for every important missing requirement.
+
+The final matchScore should reflect the actual fit.
+Do not default to values between 80 and 90.
+Scores below 50 are acceptable for weak candidates.
+Scores above 90 should only be given to exceptional matches.
+
 Do NOT wrap the JSON inside markdown.
 Do NOT include explanations.
 Do NOT include any text before or after the JSON.
@@ -193,7 +209,6 @@ Do NOT include any text before or after the JSON.
     ],
   });
 
-  console.log(JSON.stringify(response.choices, null, 2));
 
   const raw = response.choices?.[0]?.message?.content;
 
