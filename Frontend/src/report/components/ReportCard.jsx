@@ -24,7 +24,11 @@ const ReportCard = ({ report }) => {
       <div className="flex justify-between items-center mt-8">
         <div className="flex items-center gap-2 text-zinc-500 text-sm">
           <CalendarDays size={16} />
-          {new Date(report.createdAt).toLocaleDateString()}
+          {new Date(report.createdAt).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          })}
         </div>
 
         <div className="flex items-center gap-2 text-indigo-400">

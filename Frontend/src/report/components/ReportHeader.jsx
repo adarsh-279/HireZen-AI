@@ -13,7 +13,11 @@ const ReportHeader = ({ report }) => {
           <div className="mt-5 flex flex-wrap gap-6 text-sm text-zinc-400">
             <div className="flex items-center gap-2">
               <CalendarDays size={16} />
-              {new Date(report.createdAt).toLocaleDateString()}
+              {new Date(report.createdAt).toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })}
             </div>
 
             <div className="flex items-center gap-2">
@@ -25,7 +29,7 @@ const ReportHeader = ({ report }) => {
 
         {/* Right */}
         <div className="flex flex-col items-center gap-5">
-          <div className="relative w-28 h-28 rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center">
+          <div className="relative w-28 h-28 rounded-full bg-linear-to-br from-indigo-600 to-purple-600 flex items-center justify-center">
             <div className="w-24 h-24 rounded-full bg-[#181818] flex flex-col items-center justify-center">
               <span className="text-3xl font-bold">{report.matchScore}%</span>
 
