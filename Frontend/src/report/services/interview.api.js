@@ -43,3 +43,20 @@ export const getInterviewReportById = async (interviewId) => {
 
     return response.data
 }
+
+/**
+ * @description download a specific interview report as a PDF by its id
+ */
+
+export async function downloadInterviewReport(interviewId) {
+    try {
+        const response = await api.get(`/api/interview/report/${interviewId}/pdf`,{
+            responseType: "blob",
+        });
+
+        return response;
+    } catch (error) {
+        console.error("Download PDF Error:", error.response?.data || error.message);
+        throw error;
+    }
+}

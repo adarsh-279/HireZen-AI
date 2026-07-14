@@ -16,7 +16,7 @@ import { useInterview } from "../hooks/useInterview";
 
 const ReportDetails = () => {
   const { id } = useParams();
-  const { report, getReportById, loading } = useInterview();
+  const { report, getReportById, loading, downloadReport } = useInterview();
 
   useEffect(() => {
     if (typeof getReportById === "function" && id) {
@@ -40,7 +40,7 @@ const ReportDetails = () => {
 
           {!loading && report && (
             <>
-              <ReportHeader report={report} />
+              <ReportHeader report={report} downloadReport={downloadReport} />
 
               <CandidateSummary report={report} />
 

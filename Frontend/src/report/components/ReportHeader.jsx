@@ -1,6 +1,6 @@
 import { CalendarDays, FileText, Download } from "lucide-react";
 
-const ReportHeader = ({ report }) => {
+const ReportHeader = ({ report, downloadReport }) => {
   return (
     <div className="bg-[#181818] border border-zinc-800 rounded-xl p-8">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
@@ -37,7 +37,10 @@ const ReportHeader = ({ report }) => {
             </div>
           </div>
 
-          <button className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 transition px-5 py-2 rounded-lg font-medium">
+          <button 
+            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 transition px-5 py-2 rounded-lg font-medium"
+            onClick={() => downloadReport(report._id)}
+          >
             <Download size={18} />
             Download PDF
           </button>

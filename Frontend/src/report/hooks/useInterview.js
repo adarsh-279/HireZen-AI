@@ -1,9 +1,5 @@
 import { useContext } from "react";
-import {
-  generateInterviewReport,
-  getAllInterviewReport,
-  getInterviewReportById,
-} from "../services/interview.api.js";
+import { generateInterviewReport, getAllInterviewReport, getInterviewReportById, downloadInterviewReport } from "../services/interview.api.js";
 import { InterviewContext } from "../services/Interview.context.jsx";
 
 export const useInterview = () => {
@@ -61,6 +57,46 @@ export const useInterview = () => {
     }
   };
 
+  const downloadReport = async (interviewId) => {
+    try {
+      const response = await downloadInterviewReport(interviewId);
+
+      const blob = new Blob([response.data], {
+        type: "application/pdf",
+      });
+
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+
+      link.href = url;
+
+      const disposition = response.headers["content-disposition"];
+
+      let filename = "Interview_Report.pdf";
+
+      if (disposition) {
+        const match = disposition.match(/filename="?([^"]+)"?/);
+
+        if (match) {
+          filename = match[1];
+        }
+      }
+
+      link.download = filename;
+
+      document.body.appendChild(link);
+
+      link.click();
+
+      link.remove();
+
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return {
     loading,
     report,
@@ -68,5 +104,6 @@ export const useInterview = () => {
     generateReport,
     getAllReport,
     getReportById,
+    downloadReport,
   };
 };

@@ -1,7 +1,8 @@
 import { PDFParse } from "pdf-parse"
 import generateInterviewReport from "../services/ai.service.js"
 import interviewReportModel from "../models/interviewReport.model.js"
-import { get } from "mongoose";
+import { generatePDF } from "../services/pdf.service.js";
+import { generateReportHTML } from "../templates/report.template.js";
 
 /**
  * @description generate new interview report on the basis of user self description, resume and job description
@@ -79,8 +80,52 @@ async function getInterviewReportByIdController(req, res) {
     })
 }
 
+/**
+ * @description Download interview report as PDF
+ */
+
+async function downloadInterviewReportPDFController(req, res) {
+    try {
+        const { interviewId } = req.params;
+
+        const report = await interviewReportModel.findOne({
+        _id: interviewId,
+        user: req.user.id,
+        })
+        .populate("user", "username");
+
+        if (!report) {
+        return res.status(404).json({
+            message: "Interview report not found",
+        });
+        }
+
+        const html = generateReportHTML(report);
+
+        const pdfBuffer = await generatePDF(html);
+
+        res.setHeader("Content-Type", "application/pdf");
+
+        const fileName = `${report.user.username}_${report.title.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase()}.pdf`;
+
+        res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="${fileName}"`
+        );
+
+        res.send(pdfBuffer);
+    } catch (error) {
+        console.error(error);
+
+        res.status(500).json({
+        message: "Failed to generate PDF",
+        });
+    }
+}
+
 export default {
     generateInterviewReportController,
     getAllInterviewReportController,
     getInterviewReportByIdController,
+    downloadInterviewReportPDFController,
 }
