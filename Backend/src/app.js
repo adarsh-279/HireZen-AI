@@ -19,6 +19,8 @@ app.use(cors({
     credentials: true
 }))
 
+app.set("trust proxy", 1);
+
 /* all authentication related routes are used from here */
 app.use("/api/auth", authRouter)
 
@@ -30,7 +32,7 @@ app.get("/", (req, res) => {
 });
 
 app.listen(process.env.PORT, () => {
-    console.log(`Server is running on port: https://localhost:${process.env.PORT}`)
+    console.log(`Server is running on port: https://localhost:${process.env.PORT} || 8000`)
 });
 
 export default app;
