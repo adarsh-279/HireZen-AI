@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@font-face {
+    font-family: "HireZenAI";
+    src: url("./assets/HireZenAI.woff2") format("woff2");
+    font-weight: normal;
+    font-style: normal;
+}
+
+#root{
+    min-height: 100vh;
+    width: 100%;
+    background-color: #111111;
+    color: #FAF9F6;
+    font-family: "HireZenAI";
+}
