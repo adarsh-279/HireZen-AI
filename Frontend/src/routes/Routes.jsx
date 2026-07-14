@@ -6,8 +6,13 @@ import Dashboard from "../dashboard/pages/Dashboard.jsx";
 import ResumeUpload from "../resume/pages/ResumeUpload.jsx";
 import InterviewReport from "../report/pages/InterviewReport.jsx";
 import ReportDetails from "../report/components/ReportDetails.jsx";
+import Home from "../home/pages/Home.jsx";
 
 export const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Home />,
+  },
   {
     path: "/dashboard",
     element: (
@@ -38,7 +43,7 @@ export const router = createBrowserRouter([
       <Protected>
         <InterviewReport />
       </Protected>
-    )
+    ),
   },
   {
     path: "/reports/:id",
@@ -46,6 +51,6 @@ export const router = createBrowserRouter([
       <Protected>
         <ReportDetails />
       </Protected>
-    )
+    ),
   },
 ]);
