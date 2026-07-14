@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { generateInterviewReport, getAllInterviewReport, getInterviewReportById, downloadInterviewReport } from "../services/interview.api.js";
-import { InterviewContext } from "../services/Interview.context.jsx";
+import { InterviewContext } from "../services/interview.context.jsx";
 
 export const useInterview = () => {
   const context = useContext(InterviewContext);
