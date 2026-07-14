@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { InterviewContext } from "./Interview.context";
+import { InterviewContext } from "./interview.context.jsx";
 
 
 export const InterviewProvider = ({ children }) => {
