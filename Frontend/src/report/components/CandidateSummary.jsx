@@ -18,7 +18,7 @@ const CandidateSummary = ({ report }) => {
           </div>
         </div>
 
-        <div className="rounded-lg border border-zinc-800 bg-[#111] p-5">
+        <div className="rounded-lg border border-zinc-800 bg-[#111] p-5 h-72 overflow-y-auto">
           <p className="text-zinc-300 leading-7 whitespace-pre-line">
             {report.selfDescription}
           </p>
