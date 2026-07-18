@@ -42,7 +42,15 @@ async function registerUserController(req, res) {
         {expiresIn: "1d"}
     )
 
-    res.cookie("token", token)
+    const cookieOptions = {
+      httpOnly: true, // Prevent XSS attacks
+      secure: true, // Only send over HTTPS
+      sameSite: "none", // Allow cross-origin
+      path: "/", // Accessible to all routes
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    };
+
+    res.cookie("token", token, cookieOptions);
 
     res.status(201).json({
         message: "User created sucessfully",
@@ -89,7 +97,15 @@ async function loginUserController(req, res) {
         {expiresIn: "1d"}
     )
 
-    res.cookie("token", token)
+    const cookieOptions = {
+        httpOnly: true, // Prevent XSS attacks
+        secure: true, // Only send over HTTPS
+        sameSite: "none", // Allow cross-origin
+        path: "/", // Accessible to all routes
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
+    };
+
+    res.cookie("token", token, cookieOptions);
 
     res.status(200).json({
         message: "User logged in sucessfully",
@@ -116,7 +132,14 @@ async function logoutUserController(req, res) {
         await blacklistTokenModel.create({token})
     }
 
-    res.clearCookie("token", { httpOnly: true });
+    const cookieOptions = {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        path: "/"
+    };
+
+    res.clearCookie("token", cookieOptions);
 
     res.status(200).json({
         message: "User logged out sucessfully"
